@@ -1,115 +1,55 @@
-// 将静态变量声明移到文件顶部，但不初始化
+#import <UIKit/UIKit.h>
+#import <CoreGraphics/CoreGraphics.h>
+#import <QuartzCore/QuartzCore.h>
+
 static UIColor *avatarLightBorderColor;
 static UIColor *avatarDarkBorderColor;
 
-// 添加构造函数在运行时初始化
 __attribute__((constructor))
 static void initialize() {
     avatarLightBorderColor = [UIColor whiteColor];
     avatarDarkBorderColor = [UIColor blackColor];
 }
 
-// 其余代码保持不变
-#import <UIKit/UIKit.h>
-#import <objc/runtime.h>
-
-static BOOL enabled = YES;
-static BOOL borderEnabled = NO;
-
-static CGFloat avatarRadius = 65.0;
-static CGFloat avatarBorderWidth = 1.9;
-static UIColor *avatarLightBorderColor = [UIColor whiteColor];
-static UIColor *avatarDarkBorderColor = [UIColor blackColor];
-
-static CGFloat inputRadius = 18.0;
-static CGFloat inputBorderWidth = 0.0;
-
-static CGFloat patRadius = 15.0;
-static CGFloat patBorderWidth = 2.0;
-
-static CGFloat timeRadius = 10.0;
-static CGFloat timeBorderWidth = 1.8;
-
-static CGFloat buttonRadius = 20.0;
-static CGFloat buttonBorderWidth = 0.0;
-
-static CGFloat emojiRadius = 22.6;
-static CGFloat emojiBorderWidth = 0.0;
-
-static CGFloat layerRadius = 28.4;
-static CGFloat layerBorderWidth = 0.0;
-
-static CGFloat listRadius = 17.0;
-static CGFloat listBorderWidth = 0.0;
-
-static void loadSettings() {
-    NSDictionary *prefs = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"com.example.wechatcorner.prefs"];
-    
-    if (prefs) {
-        enabled = [prefs[@"enabled"] boolValue];
-        borderEnabled = [prefs[@"borderEnabled"] boolValue];
-        
-        avatarRadius = [prefs[@"avatarRadius"] floatValue];
-        avatarBorderWidth = [prefs[@"avatarBorderWidth"] floatValue];
-        
-        inputRadius = [prefs[@"inputRadius"] floatValue];
-        inputBorderWidth = [prefs[@"inputBorderWidth"] floatValue];
-        
-        patRadius = [prefs[@"patRadius"] floatValue];
-        patBorderWidth = [prefs[@"patBorderWidth"] floatValue];
-        
-        timeRadius = [prefs[@"timeRadius"] floatValue];
-        timeBorderWidth = [prefs[@"timeBorderWidth"] floatValue];
-        
-        buttonRadius = [prefs[@"buttonRadius"] floatValue];
-        buttonBorderWidth = [prefs[@"buttonBorderWidth"] floatValue];
-        
-        emojiRadius = [prefs[@"emojiRadius"] floatValue];
-        emojiBorderWidth = [prefs[@"emojiBorderWidth"] floatValue];
-        
-        layerRadius = [prefs[@"layerRadius"] floatValue];
-        layerBorderWidth = [prefs[@"layerBorderWidth"] floatValue];
-        
-        listRadius = [prefs[@"listRadius"] floatValue];
-        listBorderWidth = [prefs[@"listBorderWidth"] floatValue];
-    }
-}
-
-static void applyCornerToView(UIView *view, CGFloat radius, CGFloat borderWidth, UIColor *borderColor) {
-    if (!enabled || !view) return;
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        view.layer.cornerRadius = radius;
-        view.layer.masksToBounds = YES;
-        
-        if (borderEnabled && borderWidth > 0) {
-            view.layer.borderWidth = borderWidth;
-            if (borderColor) {
-                view.layer.borderColor = borderColor.CGColor;
-            }
-        } else {
-            view.layer.borderWidth = 0;
-        }
-    });
-}
-
 %hook UIView
 
-- (void)didMoveToWindow {
+- (void)layoutSubviews {
     %orig;
     
-    if (!enabled) return;
+    // 检查是否为微信的头像视图
+    if ([self isKindOfClass:NSClassFromString(@"WCAvatarView")] || 
+        [self isKindOfClass:NSClassFromString(@"WCContactAvatarView")]) {
+        self.layer.cornerRadius = 8.0;
+        self.layer.masksToBounds = YES;
+        self.layer.borderWidth = 1.0;
+        
+        // 根据系统外观设置边框颜色
+        if (@available(iOS 13.0, *)) {
+            if ([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark) {
+                self.layer.borderColor = avatarDarkBorderColor.CGColor;
+            } else {
+                self.layer.borderColor = avatarLightBorderColor.CGColor;
+            }
+        } else {
+            self.layer.borderColor = avatarLightBorderColor.CGColor;
+        }
+    }
     
-    NSString *className = NSStringFromClass([self class]);
+    // 检查是否为微信的消息气泡
+    if ([self isKindOfClass:NSClassFromString(@"WCBubbleView")] || 
+        [self isKindOfClass:NSClassFromString(@"WCMessageBubbleView")]) {
+        self.layer.cornerRadius = 12.0;
+        self.layer.masksToBounds = YES;
+    }
     
-    if ([className containsString:@"Avatar"]) {
-        applyCornerToView(self, avatarRadius, avatarBorderWidth, avatarLightBorderColor);
-    } else if ([className containsString:@"Input"]) {
-        applyCornerToView(self, inputRadius, inputBorderWidth, nil);
-    } else if ([className containsString:@"Button"]) {
-        applyCornerToView(self, buttonRadius, buttonBorderWidth, nil);
-    } else if ([className containsString:@"Emoji"]) {
-        applyCornerToView(self, emojiRadius, emojiBorderWidth, nil);
+    // 检查是否为微信的按钮
+    if ([self isKindOfClass:NSClassFromString(@"WCButton")] || 
+        [self isKindOfClass:[UIButton class]]) {
+        // 只处理特定的按钮，避免影响所有按钮
+        if (self.frame.size.height > 30 && self.frame.size.height < 50) {
+            self.layer.cornerRadius = 8.0;
+            self.layer.masksToBounds = YES;
+        }
     }
 }
 
@@ -117,79 +57,15 @@ static void applyCornerToView(UIView *view, CGFloat radius, CGFloat borderWidth,
 
 %hook UIImageView
 
-- (void)didMoveToWindow {
+- (void)layoutSubviews {
     %orig;
     
-    if (!enabled) return;
-    
-    if ([self.accessibilityLabel containsString:@"头像"] || 
-        [self.accessibilityIdentifier containsString:@"avatar"]) {
-        applyCornerToView(self, avatarRadius, avatarBorderWidth, avatarLightBorderColor);
+    // 处理图片视图的圆角
+    if ([self isKindOfClass:NSClassFromString(@"WCAvatarView")] || 
+        [self isKindOfClass:NSClassFromString(@"WCContactAvatarView")]) {
+        self.layer.cornerRadius = 8.0;
+        self.layer.masksToBounds = YES;
     }
 }
 
 %end
-
-%hook UITextView
-
-- (void)didMoveToWindow {
-    %orig;
-    
-    if (!enabled) return;
-    
-    applyCornerToView(self, inputRadius, inputBorderWidth, nil);
-}
-
-%end
-
-%hook UITextField
-
-- (void)didMoveToWindow {
-    %orig;
-    
-    if (!enabled) return;
-    
-    applyCornerToView(self, inputRadius, inputBorderWidth, nil);
-}
-
-%end
-
-%hook UIButton
-
-- (void)didMoveToWindow {
-    %orig;
-    
-    if (!enabled) return;
-    
-    applyCornerToView(self, buttonRadius, buttonBorderWidth, nil);
-}
-
-%end
-
-%hook UILabel
-
-- (void)didMoveToWindow {
-    %orig;
-    
-    if (!enabled) return;
-    
-    NSString *text = self.text;
-    if ([text containsString:@"拍一拍"] || [self.accessibilityLabel containsString:@"拍一拍"]) {
-        applyCornerToView(self, patRadius, patBorderWidth, nil);
-    }
-}
-
-%end
-
-%ctor {
-    loadSettings();
-    
-    CFNotificationCenterAddObserver(
-        CFNotificationCenterGetDarwinNotifyCenter(),
-        NULL,
-        (CFNotificationCallback)loadSettings,
-        CFSTR("com.example.wechatcorner.prefschanged"),
-        NULL,
-        CFNotificationSuspensionBehaviorCoalesce
-    );
-}
