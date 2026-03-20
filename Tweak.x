@@ -1,3 +1,15 @@
+// 将静态变量声明移到文件顶部，但不初始化
+static UIColor *avatarLightBorderColor;
+static UIColor *avatarDarkBorderColor;
+
+// 添加构造函数在运行时初始化
+__attribute__((constructor))
+static void initialize() {
+    avatarLightBorderColor = [UIColor whiteColor];
+    avatarDarkBorderColor = [UIColor blackColor];
+}
+
+// 其余代码保持不变
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
