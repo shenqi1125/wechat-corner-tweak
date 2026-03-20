@@ -1,0 +1,9 @@
+Package: com.example.wechatcorner
+Name: 微信圆角插件
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: 为微信添加圆角效果，支持头像、输入框、按钮等多种组件的圆角设置
+Maintainer: 筱茨
+Author: 筱茨
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000), firmware (>= 7.0)
