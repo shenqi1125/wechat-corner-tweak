@@ -22,17 +22,7 @@ static void initialize() {
         self.layer.cornerRadius = 8.0;
         self.layer.masksToBounds = YES;
         self.layer.borderWidth = 1.0;
-        
-        // 根据系统外观设置边框颜色
-        if (@available(iOS 13.0, *)) {
-            if ([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark) {
-                self.layer.borderColor = avatarDarkBorderColor.CGColor;
-            } else {
-                self.layer.borderColor = avatarLightBorderColor.CGColor;
-            }
-        } else {
-            self.layer.borderColor = avatarLightBorderColor.CGColor;
-        }
+        self.layer.borderColor = avatarLightBorderColor.CGColor;
     }
     
     // 检查是否为微信的消息气泡
