@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.sheng1125.wechatcornerprefs</string>
+    <key>PreferenceSpecifiers</key>
+    <array>
+        <dict>
+            <key>Bundle</key>
+            <string>WeChatCornerPrefs</string>
+            <key>Controller</key>
+            <string>WeChatCornerPrefsListController</string>
+            <key>Icon</key>
+            <string>avatar</string>
+            <key>Label</key>
+            <string>WeChat Corner</string>
+        </dict>
+    </array>
+</dict>
+</plist>
