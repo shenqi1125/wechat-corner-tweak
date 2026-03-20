@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>items</key>
+    <array>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>label</key>
+            <string>微信圆角设置</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSliderCell</string>
+            <key>default</key>
+            <real>8</real>
+            <key>label</key>
+            <string>头像圆角半径</string>
+            <key>max</key>
+            <real>20</real>
+            <key>min</key>
+            <real>0</real>
+            <key>postNotification</key>
+            <string>WeChatCornerPrefsChanged</string>
+            <key>key</key>
+            <string>avatarCornerRadius</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSliderCell</string>
+            <key>default</key>
+            <real>12</real>
+            <key>label</key>
+            <string>气泡圆角半径</string>
+            <key>max</key>
+            <real>20</real>
+            <key>min</key>
+            <real>0</real>
+            <key>postNotification</key>
+            <string>WeChatCornerPrefsChanged</string>
+            <key>key</key>
+            <string>bubbleCornerRadius</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSliderCell</string>
+            <key>default</key>
+            <real>8</real>
+            <key>label</key>
+            <string>按钮圆角半径</string>
+            <key>max</key>
+            <real>20</real>
+            <key>min</key>
+            <real>0</real>
+            <key>postNotification</key>
+            <string>WeChatCornerPrefsChanged</string>
+            <key>key</key>
+            <string>buttonCornerRadius</string>
+        </dict>
+    </array>
+    <key>title</key>
+    <string>WeChat Corner</string>
+</dict>
+</plist>
